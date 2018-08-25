@@ -114,11 +114,11 @@
             try {
                 const dateStringParts = date.split(' ');
                 if (this.platform === 'facebook') {
-                    const dateString = `${dateStringParts}[0] ${dateStringParts[1]} 2018`;
+                    const dateString = `${dateStringParts[0]} ${dateStringParts[1]} 2018`;
                     daysFromNow = Math.round(((((Date.now() - new Date(dateString).getTime()) / 1000) / 60) / 60) / 24);
                 } else if (this.platform === 'twitter') {
                     if (dateStringParts.length === 2) {
-                        const dateString = `${dateStringParts}[0] ${dateStringParts[1]} 2018`;
+                        const dateString = `${dateStringParts[0]} ${dateStringParts[1]} 2018`;
                         daysFromNow = Math.round(((((Date.now() - new Date(dateString).getTime()) / 1000) / 60) / 60) / 24);
                     } else if (dateStringParts.length === 3 ) {
                         daysFromNow = Math.round(((((Date.now() - new Date(date).getTime()) / 1000) / 60) / 60) / 24);
@@ -175,5 +175,5 @@
     }
 
     // new Scraper('facebook').main();
-    // new Scraper('twitter').main();
+    new Scraper('twitter').main();
 })();
