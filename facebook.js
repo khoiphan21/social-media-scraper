@@ -1,4 +1,9 @@
 (function () {
+    // The below lines are needed to ensure console works
+    var frame = document.createElement('iframe');
+    document.body.appendChild(frame);
+    console = frame.contentWindow.console
+
     /**
      * NOTES: MAKE SURE JQUERY IS PRESENT FIRST
      */
@@ -7,13 +12,21 @@
 
     class Scraper {
 
-        constructor(platform='facebook') {
+        constructor(platform = 'facebook') {
+            this.platform = platform;
+
             if (platform === 'facebook') {
                 this.likesQuery = '._4arz>span';
                 this.commentsQuery = 'a._ipm._-56';
                 this.sharesQuery = '._ipm._2x0m';
                 this.postQuery = '._4arz>span';
                 this.datesQuery = 'span.timestampContent';
+            } else if (platform === 'twitter') {
+                this.likesQuery = '.js-actionFavorite>span>span.ProfileTweet-actionCountForPresentation';
+                this.commentsQuery = '.js-actionReply>span>span.ProfileTweet-actionCountForPresentation';
+                this.sharesQuery = '.js-actionRetweet>span>span.ProfileTweet-actionCountForPresentation';
+                this.postQuery = '.tweet.js-stream-tweet';
+                this.datesQuery = '._timestamp';
             }
         }
 
@@ -89,13 +102,44 @@
             }
             return timeStamps;
         }
+        
+        getAllDatesTwitter() {
+            let rawTimeStamps = this.query(this.datesQuery).map(date => {return date.innerHTML});
+            return rawTimeStamps;
+
+        }
 
         getDaysFromNow(date) {
-            const dateString = `${date.split(' ')[0]} ${date.split(' ')[1]} 2018`;
-            return Math.round(((((Date.now() - new Date(dateString).getTime()) / 1000) / 60) / 60) / 24)
+            let daysFromNow = null;
+            try {
+                const dateStringParts = date.split(' ');
+                if (this.platform === 'facebook') {
+                    const dateString = `${dateStringParts}[0] ${dateStringParts[1]} 2018`;
+                    daysFromNow = Math.round(((((Date.now() - new Date(dateString).getTime()) / 1000) / 60) / 60) / 24);
+                } else if (this.platform === 'twitter') {
+                    if (dateStringParts.length === 2) {
+                        const dateString = `${dateStringParts}[0] ${dateStringParts[1]} 2018`;
+                        daysFromNow = Math.round(((((Date.now() - new Date(dateString).getTime()) / 1000) / 60) / 60) / 24);
+                    } else if (dateStringParts.length === 3 ) {
+                        daysFromNow = Math.round(((((Date.now() - new Date(date).getTime()) / 1000) / 60) / 60) / 24);
+
+                    }
+                }
+            } catch {
+                console.log('error parsing date: ', date);
+            }
+            return daysFromNow;
         }
 
         main() {
+           if (this.platform === 'facebook') {
+                this.printForFacebook();
+           } else if (this.platform === 'twitter') {
+               this.printForTwitter();
+           }
+        }
+
+        printForFacebook() {
             const totalLikes = `Total number of likes: ${this.getTotalLikes()}`;
 
             const totalComments = `Total number of comments: ${this.getTotalComments()}`;
@@ -111,7 +155,25 @@
 
             console.log(`${totalLikes}\n${totalComments}\n${totalShares}\n${totalPosts}\n${postData}\n${timeFrame}`);
         }
+
+        printForTwitter() {
+            const totalLikes = `Total number of likes: ${this.getTotalLikes()}`;
+
+            const totalComments = `Total number of replies: ${this.getTotalComments()}`;
+
+            const totalShares = `Total number of retweets: ${this.getTotalShares()}`;
+
+            const totalPosts = `Total number of posts: ${this.getTotalPosts()}`;
+
+            const allDates = this.getAllDatesTwitter();
+            const oldestDate = allDates[allDates.length - 1];
+            const postData = `Most recent post: ${allDates[0]}. Oldest post retrieved: ${oldestDate}`;
+            const timeFrame = `Oldest post was ${this.getDaysFromNow(oldestDate)} days from today (25/08)`;
+
+            console.log(`${totalLikes}\n${totalComments}\n${totalShares}\n${totalPosts}\n${postData}\n${timeFrame}`);
+        }
     }
 
-    new Scraper().main();
+    // new Scraper('facebook').main();
+    // new Scraper('twitter').main();
 })();
