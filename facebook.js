@@ -5,9 +5,17 @@
 
     MAX_NUM_POST = 50;
 
-    delete Scraper;
-
     class Scraper {
+
+        constructor(platform='facebook') {
+            if (platform === 'facebook') {
+                this.likesQuery = '._4arz>span';
+                this.commentsQuery = 'a._ipm._-56';
+                this.sharesQuery = '._ipm._2x0m';
+                this.postQuery = '._4arz>span';
+                this.datesQuery = 'span.timestampContent';
+            }
+        }
 
         query(key) {
             const all = $(key);
@@ -27,7 +35,7 @@
 
         // To get the total number of likes
         getTotalLikes() {
-            let likeElements = this.query('._4arz>span');
+            let likeElements = this.query(this.likesQuery);
             let numLikes = 0;
 
             for (let element of likeElements) {
@@ -42,7 +50,7 @@
         }
 
         getTotalComments(print = false) {
-            let commentElements = this.query('a._ipm._-56');
+            let commentElements = this.query(this.commentsQuery);
 
             return this.getTotalFromString(commentElements, print);
         }
@@ -62,17 +70,17 @@
         }
 
         getTotalShares(print = false) {
-            let shareElements = this.query('._ipm._2x0m');
+            let shareElements = this.query(this.sharesQuery);
 
             return this.getTotalFromString(shareElements, print);
         }
 
         getTotalPosts() {
-            return this.query('._4arz>span').length;
+            return this.query(this.postQuery).length;
         }
 
         getAllDates() {
-            let rawTimeStamps = this.query('span.timestampContent');
+            let rawTimeStamps = this.query(this.datesQuery);
             let timeStamps = []
             for (let time of rawTimeStamps) {
                 if (time.id !== "") {
