@@ -54,6 +54,8 @@
             for (let element of likeElements) {
                 if (element.innerHTML.toLowerCase().indexOf('k') > 0) {
                     let decimal = Number(element.innerHTML.slice(0, element.innerHTML.length - 1))
+                    console.log(element);
+                    console.log(numLikes)
                     numLikes += decimal * 1000;
                 } else {
                     numLikes += Number(element.innerHTML);
