@@ -52,13 +52,12 @@
             let numLikes = 0;
 
             for (let element of likeElements) {
-                if (element.innerHTML.toLowerCase().indexOf('k') > 0) {
-                    let decimal = Number(element.innerHTML.slice(0, element.innerHTML.length - 1))
-                    console.log(element);
-                    console.log(numLikes)
+                let amount = /[\d.kK]+/.exec(element.innerHTML)[0];
+                if (amount.toLowerCase().indexOf('k') > 0) {
+                    let decimal = Number(amount.slice(0, amount.length - 1))
                     numLikes += decimal * 1000;
                 } else {
-                    numLikes += Number(element.innerHTML);
+                    numLikes += Number(amount);
                 }
             }
             return numLikes;
@@ -153,7 +152,7 @@
             const allDates = this.getAllDates();
             const oldestDate = allDates[allDates.length - 1];
             const postData = `Most recent post: ${allDates[0]}. Oldest post retrieved: ${oldestDate}`;
-            const timeFrame = `Oldest post was ${this.getDaysFromNow(oldestDate)} days from today (25/08)`;
+            const timeFrame = `Oldest post was ${this.getDaysFromNow(oldestDate)} days from today`;
 
             console.log(`${totalLikes}\n${totalComments}\n${totalShares}\n${totalPosts}\n${postData}\n${timeFrame}`);
         }
@@ -170,12 +169,12 @@
             const allDates = this.getAllDatesTwitter();
             const oldestDate = allDates[allDates.length - 1];
             const postData = `Most recent post: ${allDates[0]}. Oldest post retrieved: ${oldestDate}`;
-            const timeFrame = `Oldest post was ${this.getDaysFromNow(oldestDate)} days from today (25/08)`;
+            const timeFrame = `Oldest post was ${this.getDaysFromNow(oldestDate)} days from today`;
 
             console.log(`${totalLikes}\n${totalComments}\n${totalShares}\n${totalPosts}\n${postData}\n${timeFrame}`);
         }
     }
 
-    // new Scraper('facebook').main();
-    new Scraper('twitter').main();
+    new Scraper('facebook').main();
+    // new Scraper('twitter').main();
 })();
