@@ -16,10 +16,10 @@
             this.platform = platform;
 
             if (platform === 'facebook') {
-                this.likesQuery = '._4arz>span';
-                this.commentsQuery = 'a._ipm._-56';
-                this.sharesQuery = '._ipm._2x0m';
-                this.postQuery = '._4arz>span';
+                this.likesQuery = '._81hb';
+                this.commentsQuery = '._3hg-';
+                this.sharesQuery = '._3rwx';
+                this.postQuery = '._5pcr';
                 this.datesQuery = 'span.timestampContent';
             } else if (platform === 'twitter') {
                 this.likesQuery = '.js-actionFavorite>span>span.ProfileTweet-actionCountForPresentation';
@@ -103,9 +103,11 @@
             }
             return timeStamps;
         }
-        
+
         getAllDatesTwitter() {
-            let rawTimeStamps = this.query(this.datesQuery).map(date => {return date.innerHTML});
+            let rawTimeStamps = this.query(this.datesQuery).map(date => {
+                return date.innerHTML
+            });
             return rawTimeStamps;
 
         }
@@ -114,30 +116,32 @@
             let daysFromNow = null;
             try {
                 const dateStringParts = date.split(' ');
+                const now = new Date(Date.now());
+                const year = now.getFullYear();
                 if (this.platform === 'facebook') {
-                    const dateString = `${dateStringParts[0]} ${dateStringParts[1]} 2018`;
+                    const dateString = `${dateStringParts[0]} ${dateStringParts[1]} ${year}`;
                     daysFromNow = Math.round(((((Date.now() - new Date(dateString).getTime()) / 1000) / 60) / 60) / 24);
                 } else if (this.platform === 'twitter') {
                     if (dateStringParts.length === 2) {
-                        const dateString = `${dateStringParts[0]} ${dateStringParts[1]} 2018`;
+                        const dateString = `${dateStringParts[0]} ${dateStringParts[1]} ${year}`;
                         daysFromNow = Math.round(((((Date.now() - new Date(dateString).getTime()) / 1000) / 60) / 60) / 24);
-                    } else if (dateStringParts.length === 3 ) {
+                    } else if (dateStringParts.length === 3) {
                         daysFromNow = Math.round(((((Date.now() - new Date(date).getTime()) / 1000) / 60) / 60) / 24);
 
                     }
                 }
-            } catch {
+            } catch (error) {
                 console.log('error parsing date: ', date);
             }
             return daysFromNow;
         }
 
         main() {
-           if (this.platform === 'facebook') {
+            if (this.platform === 'facebook') {
                 this.printForFacebook();
-           } else if (this.platform === 'twitter') {
-               this.printForTwitter();
-           }
+            } else if (this.platform === 'twitter') {
+                this.printForTwitter();
+            }
         }
 
         printForFacebook() {
@@ -150,6 +154,7 @@
             const totalPosts = `Total number of posts: ${this.getTotalPosts()}`;
 
             const allDates = this.getAllDates();
+            console.log("TCL: Scraper -> printForFacebook -> allDates", allDates)
             const oldestDate = allDates[allDates.length - 1];
             const postData = `Most recent post: ${allDates[0]}. Oldest post retrieved: ${oldestDate}`;
             const timeFrame = `Oldest post was ${this.getDaysFromNow(oldestDate)} days from today`;
